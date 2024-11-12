@@ -56,19 +56,17 @@ def test_build_utterances(local_um, template, utterances):
     assert local_um.build_utterances(template) == utterances
 
 
-def test_ibu_aut(global_um):
+def test_ibu_aut(local_um):
     """
     Test methods following UtterMore methods:
         - iter_build_utterances
         - add_utterance_template
     """
-    global_um.add_utterance_template(DOUBLE_CURLY)
-    global_um.add_utterance_template(SINGLE_CURLY)
-    global_um.add_utterance_template(OR_CURLY)
-    global_um.iter_build_utterances()
-    assert global_um.utterances == [DC_ANS, SC_ANS, OC_ANS]
-    global_um.utterance_templates.clear()
-    global_um.utterances.clear()
+    local_um.add_utterance_template(DOUBLE_CURLY)
+    local_um.add_utterance_template(SINGLE_CURLY)
+    local_um.add_utterance_template(OR_CURLY)
+    local_um.iter_build_utterances()
+    assert local_um.utterances == [DC_ANS, SC_ANS, OC_ANS]
 
 
 @pytest.mark.parametrize('fname, saved_as, written_as', [
@@ -77,17 +75,23 @@ def test_ibu_aut(global_um):
     ('txt_test', 'txt', None),
     ('file_override_test', 'txt', 'csv')
 ])
-def test_saving_utterances(global_um, tmpdir, fname, saved_as, written_as):
+def test_saving_utterances(local_um, tmpdir, fname, saved_as, written_as):
     """
     Test the saving methods of UtterMore
     """
+
+    local_um.add_utterance_template(DOUBLE_CURLY)
+    local_um.add_utterance_template(SINGLE_CURLY)
+    local_um.add_utterance_template(OR_CURLY)
+    local_um.iter_build_utterances()
+
     written_as = written_as or saved_as
     test_dir = path.join(path.dirname(path.realpath(__file__)), 'test_files')
 
     if fname == 'alexa_test':
-        global_um.save_for_alexa(tmpdir, fname)
+        local_um.save_for_alexa(tmpdir, fname)
     else:
-        global_um.save_utterances(tmpdir, fname, saved_as, written_as=written_as)
+        local_um.save_utterances(tmpdir, fname, saved_as, written_as=written_as)
 
     file_name = fname + '.' + saved_as
     assert filecmp.cmp(path.join(test_dir, file_name),
